@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的常用导航</title>
+    <style>
+        :root{
+            --bg:#f5f7fa;
+            --card:#ffffff;
+            --text:#222222;
+            --subtext:#555555;
+            --hover:#e8ecf2;
+            --border:#dddddd;
+        }
+        [data-theme="dark"]{
+            --bg:#18191c;
+            --card:#242529;
+            --text:#eeeeee;
+            --subtext:#bbbbbb;
+            --hover:#2f3136;
+            --border:#3a3c42;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui, -apple-system, sans-serif;transition: background 0.3s, color 0.3s;}
+        body{
+            background: var(--bg);
+            color: var(--text);
+            min-height:100vh;
+            padding:30px 16px;
+        }
+        .wrap{
+            max-width:920px;
+            margin:0 auto;
+        }
+        header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:32px;
+        }
+        h1{
+            font-size:22px;
+            font-weight:500;
+        }
+        #themeBtn{
+            padding:8px 14px;
+            border-radius:8px;
+            border:1px solid var(--border);
+            background:var(--card);
+            color:var(--text);
+            cursor:pointer;
+            font-size:14px;
+        }
+        /* 搜索区域【已修改：去掉阴影，改用细边框】 */
+        .search-box{
+            background:var(--card);
+            border-radius:16px;
+            padding:18px;
+            border:1px solid var(--border);
+            margin-bottom:30px;
+        }
+        .search-switch{
+            display:flex;
+            gap:10px;
+            margin-bottom:14px;
+        }
+        .search-switch button{
+            padding:6px 16px;
+            border-radius:6px;
+            border:1px solid var(--border);
+            background:transparent;
+            color:var(--subtext);
+            cursor:pointer;
+        }
+        .search-switch button.active{
+            background:#3377dd;
+            color:white;
+            border-color:#3377dd;
+        }
+        .search-input-area{
+            display:flex;
+        }
+        #searchInput{
+            flex:1;
+            height:46px;
+            padding:0 16px;
+            border:1px solid var(--border);
+            border-radius:10px 0 0 10px;
+            background:transparent;
+            color:var(--text);
+            font-size:16px;
+            outline:none;
+        }
+        #searchBtn{
+            height:46px;
+            padding:0 22px;
+            border:none;
+            border-radius:0 10px 10px 0;
+            background:#3377dd;
+            color:white;
+            cursor:pointer;
+        }
+        /* 分组标题样式 */
+        .group-title{
+            font-size:18px;
+            margin:40px 0 16px;
+            padding-bottom:6px;
+            border-bottom:2px solid #dd4444;
+        }
+        /* 图标网格布局 */
+        .link-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fill, minmax(85px,1fr));
+            gap:16px;
+        }
+        .item{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            text-decoration:none;
+            padding:12px 6px;
+            border-radius:14px;
+        }
+        .item:hover{
+            background:var(--hover);
+        }
+        .icon-box{
+            width:52px;height:52px;
+            border-radius:12px;
+            background:var(--card);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:24px;
+            margin-bottom:8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .name{
+            font-size:13px;
+            color:var(--subtext);
+            text-align:center;
+        }
+        /* 超小屏幕3列兼容 */
+        @media (max-width:360px){
+            .link-grid{
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>心灵导航</h1>
+        <button id="themeBtn">🌓 切换暗色模式</button>
+    </header>
+    <!-- 搜索模块 必应 / 夸克 / 豆包AI切换 -->
+    <div class="search-box">
+        <div class="search-switch">
+            <button class="active" data-engine="bing">必应</button>
+            <button data-engine="toutiao">头条</button>
+            <button data-engine="quark">夸克</button>
+            <button data-engine="doubao">豆包</button>
+        </div>
+        <div class="search-input-area">
+            <input id="searchInput" placeholder="输入搜索内容，回车搜索">
+            <button id="searchBtn">搜索</button>
+        </div>
+    </div>
+    <!-- 网站快捷入口区域 -->
+    <div class="link-grid">
+        <a class="item" href="https://www.bilibili.com" target="_blank">
+            <div class="icon-box"><img src="icons/bilibili.png" alt="哔哩哔哩" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">哔哩哔哩</div>
+        </a>
+        <a class="item" href="https://www.douyin.com" target="_blank">
+            <div class="icon-box"><img src="icons/douyin.png" alt="抖音" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">抖音</div>
+        </a>
+        <a class="item" href="https://www.taobao.com/" target="_blank">
+            <div class="icon-box"><img src="icons/taobao.png" alt="淘宝" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">淘宝</div>
+        </a>
+        <a class="item" href="https://www.zhihu.com" target="_blank">
+             <div class="icon-box"><img src="icons/zhihu.png" alt="知乎" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">知乎</div>
+        </a>
+        <a class="item" href="https://www.jd.com" target="_blank">
+            <div class="icon-box"><img src="icons/JD.png" alt="京东" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">京东</div>
+        </a>
+        <a class="item" href="https://www.mi.com/" target="_blank">
+        <div class="icon-box"><img src="icons/xiaomi.png" alt="小米" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">小米</div>
+        </a>
+        <a class="item" href="https://clashpost.com" target="_blank">
+        <div class="icon-box"><img src="icons/coc.png" alt="COC部落驿站" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">部落驿站</div>
+        </a>
+        <a class="item" href="http://www.rubik.com.cn" target="_blank">
+           <div class="icon-box"><img src="icons/mofang.png" alt="魔方小站" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">魔方小站</div>
+        </a>
+        <a class="item" href="https://www.youtube.com" target="_blank">
+            <div class="icon-box"><img src="icons/youtube.png" alt="YouTube" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">YouTube</div>
+        </a>
+        <a class="item" href="https://steamcommunity.com" target="_blank">
+            <div class="icon-box"><img src="icons/Steam.png" alt="Steam" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">Steam</div>
+        </a>
+        <a class="item" href="https://pan.quark.cn" target="_blank">
+            <div class="icon-box"><img src="icons/kuake.png" alt="夸克" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">夸克网盘</div>
+        </a>
+        <a class="item" href="https://huaban.com" target="_blank">
+            <div class="icon-box"><img src="icons/huaban.png" alt="花瓣" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">花瓣</div>
+        </a>
+        <a class="item" href="https://github.com" target="_blank">
+            <div class="icon-box"><img src="icons/Github.png" alt="Github" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">Github</div>
+        </a>
+        <a class="item" href="https://www.163.com" target="_blank">
+            <div class="icon-box"><img src="icons/163.png" alt="网易" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">网易</div>
+        </a>
+        <a class="item" href="https://www.oldmanemu.org" target="_blank">
+            <div class="icon-box"><img src="icons/laonanren.png" alt="老男人game" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">老男人game</div>
+        </a>
+        <a class="item" href="https://wiki.52poke.com" target="_blank">
+            <div class="icon-box"><img src="icons/baokemeng.png" alt="神奇宝贝百科" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">宝贝百科</div>
+        </a>
+    </div>
+<!-- =========第二组：兴趣爱好========= -->
+    <h2 class="group-title" style="margin-top:20px;border-bottom:none;padding-bottom:0;">兴趣爱好</h2>
+    <div class="link-grid">
+        <a class="item" href="https://www.huya.com/" target="_blank">
+            <div class="icon-box"><img src="icons/huya.png" alt="虎牙" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">虎牙</div>
+        </a>
+        <a class="item" href="https://www.douyu.com/" target="_blank">
+            <div class="icon-box"><img src="icons/douyu.png" alt="斗鱼" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">斗鱼</div>
+        </a>
+        <a class="item" href="https://retrogamesnexus.com/zh-TW" target="_blank">
+            <div class="icon-box"><img src="icons/Retro.png" alt="旧游戏" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">RetroGames</div>
+        </a>
+        <a class="item" href="https://www.zol.com.cn/" target="_blank">
+            <div class="icon-box"><img src="icons/zhongguancun.png" alt="中关村" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">中关村在线</div>
+        </a>
+        <a class="item" href="https://www.iplaysoft.com/" target="_blank">
+            <div class="icon-box"><img src="icons/didiao.png" alt="异次元" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">低调异次元</div>
+        </a>
+        <a class="item" href="https://xclient.info/" target="_blank">
+            <div class="icon-box"><img src="icons/mac.png" alt="MAC" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">MAC分享</div>
+        </a>
+        <a class="item" href="https://www.isharepc.com/" target="_blank">
+            <div class="icon-box"><img src="icons/leruan.png" alt="乐软微博" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">乐软微博</div>
+        </a>
+        <a class="item" href="https://web.sanguosha.com/login/index.html" target="_blank">
+            <div class="icon-box"><img src="icons/sha.png" alt="三国杀" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">三国杀</div>
+        </a>
+        <a class="item" href="https://www.ximalaya.com/" target="_blank">
+            <div class="icon-box"><img src="icons/ximalaya.png" alt="喜马拉雅听" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">喜马拉雅</div>
+        </a>
+        <a class="item" href="https://www.kugou.com/" target="_blank">
+            <div class="icon-box"><img src="icons/kugou.png" alt="酷狗" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">酷狗</div>
+        </a>
+        <a class="item" href="https://music.163.com/" target="_blank">
+            <div class="icon-box"><img src="icons/wangyiyun.png" alt="网易云" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">网易云音乐</div>
+        </a>
+        <a class="item" href="https://wx.mail.qq.com/" target="_blank">
+            <div class="icon-box"><img src="icons/QQEmail.png" alt="QQ邮箱" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">QQ邮箱</div>
+        </a>
+        <a class="item" href="https://devfile.cn/" target="_blank">
+            <div class="icon-box"><img src="icons/devfile.png" alt="Devfile" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">Devfile</div>
+        </a>
+    </div>
+<!-- =========第三组：常用工具========= -->
+    <h2 class="group-title" style="margin-top:20px;border-bottom:none;padding-bottom:0;">常用工具</h2>
+    <div class="link-grid">
+        <a class="item" href="https://mp.weixin.qq.com/" target="_blank">
+            <div class="icon-box"><img src="icons/weixin.png" alt="微信公众号" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">公众号后台</div>
+        </a>
+        <a class="item" href="https://xiumi.us/#/" target="_blank">
+            <div class="icon-box"><img src="icons/mixiu.png" alt="米秀" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">米秀</div>
+        </a>
+        <a class="item" href="https://www.58pic.com/" target="_blank">
+            <div class="icon-box"><img src="icons/qiantu.png" alt="千图" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">千图网</div>
+        </a>
+        <a class="item" href="https://www.ilovepdf.com/zh-cn" target="_blank">
+            <div class="icon-box"><img src="icons/ilovepdf.png" alt="我爱PDF" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">ILovePDF</div>
+        </a>
+        <a class="item" href="https://www.tuozhe8.com/forum.php" target="_blank">
+            <div class="icon-box"><img src="icons/tuozhe.png" alt="拓者设计吧" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">拓者设计吧</div>
+        </a>
+        <a class="item" href="https://www.zcool.com.cn/" target="_blank">
+            <div class="icon-box"><img src="icons/zhanku.png" alt="站酷" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">站酷</div>
+        </a>
+        <a class="item" href="https://588ku.com/" target="_blank">
+            <div class="icon-box"><img src="icons/qianku.png" alt="千库" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">千库网</div>
+        </a>
+        <a class="item" href="https://www.liblib.art/" target="_blank">
+            <div class="icon-box"><img src="icons/Lib.png" alt="LiblibAI" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">LiblibAI</div>
+        </a>
+        <a class="item" href="https://www.yutu.cn/" target="_blank">
+            <div class="icon-box"><img src="icons/yutu.png" alt="玉兔" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">羽兔</div>
+        </a>
+        <a class="item" href="https://www.doooor.com/" target="_blank">
+            <div class="icon-box"><img src="icons/Door.png" alt="Door" referrerpolicy="no-referrer"style="width:32px;height:32px;border-radius:6px;"></div>
+            <div class="name">Doooor</div>
+        </a>
+    </div>
+</div>
+<script>
+// 搜索引擎配置
+const engines = {
+    bing: "https://cn.bing.com/search?q=",
+    toutiao: "https://so.toutiao.com/search?keyword=",
+    quark: "https://quark.sm.cn/s?q=",
+    doubao: "https://www.doubao.com/chat"
+};
+let currentEngine = "bing";
+
+const switchBtns = document.querySelectorAll('.search-switch button');
+const input = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+
+// 切换搜索引擎按钮
+switchBtns.forEach(btn=>{
+    btn.onclick = ()=>{
+        switchBtns.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        currentEngine = btn.dataset.engine;
+        input.focus();
+    }
+})
+
+// 执行搜索
+async function doSearch(){
+    const word = input.value.trim();
+    if(!word) return;
+
+    if(currentEngine === "doubao"){
+        //豆包：复制文字到剪贴板，打开网页
+        try{
+            await navigator.clipboard.writeText(word);
+        }catch(e){
+            console.log("复制失败");
+        }
+        window.open(engines[currentEngine], '_blank');
+    }else{
+        //必应/夸克直接搜索
+        window.open(engines[currentEngine] + encodeURIComponent(word), '_blank');
+    }
+}
+
+searchBtn.onclick = doSearch;
+input.onkeydown = e=>{
+    if(e.key === 'Enter') doSearch();
+}
+
+// 明暗主题切换
+const themeBtn = document.getElementById('themeBtn');
+themeBtn.onclick = ()=>{
+    if(document.body.getAttribute('data-theme') === 'dark'){
+        document.body.removeAttribute('data-theme');
+        localStorage.setItem('theme','light');
+    }else{
+        document.body.setAttribute('data-theme','dark');
+        localStorage.setItem('theme','dark');
+    }
+}
+// 读取上次保存的主题
+if(localStorage.getItem('theme') === 'dark'){
+    document.body.setAttribute('data-theme','dark');
+}
+</script>
+</body>
+</html>
