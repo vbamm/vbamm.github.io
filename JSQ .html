@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>项链 LTWH计算器 A‑M1‑REC‑V4</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui, sans-serif;margin:0;padding:0;}
+body{max-width:960px;margin:22px auto;padding:0 16px;background:#ffffff;}
+h1{font-size:20px;margin-bottom:16px;font-weight:600;}
+
+/*顶部横向模式卡片组，匹配截图样式*/
+.mode-wrap{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+.mode-card{
+    flex:1;
+    padding:12px 8px;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ffffff;
+    user-select:none;
+}
+.mode-card.active{
+    background:#2563eb;
+    color:#ffffff;
+    border-color:#2563eb;
+}
+.mode-card .title{
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:4px;
+}
+.mode-card .desc{
+    font-size:12px;
+    line-height:1.4;
+    opacity:0.92;
+}
+
+.panel{margin-bottom:14px;}
+.row{
+    margin:10px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.row label{
+    width:142px;
+    font-size:15px;
+}
+.row input{
+    padding:8px 10px;
+    width:220px;
+    font-size:15px;
+    border:1px solid #cbd5e1;
+    border-radius:6px;
+}
+
+button{
+    padding:8px 18px;
+    font-size:15px;
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+button:hover{background:#1d4ed8;}
+
+.btn-record{padding:5px 14px;font-size:14px;}
+.btn-clear-item{padding:4px 10px;font-size:13px;background:#64748b;}
+.btn-clear-all{padding:7px 16px;font-size:14px;background:#475569;}
+
+.result{margin-top:16px;line-height:1.7;font-size:15px;}
+.warn-y{color:#b45309;background:#fef3c7;padding:8px 10px;border-radius:6px;margin:6px 0;}
+.warn-r{color:#b91c1c;background:#fee2e2;padding:8px 10px;border-radius:6px;margin:6px 0;}
+.normal{
+    background:#ecfdf5;
+    padding:10px 12px;
+    border-radius:6px;
+    margin:6px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.hide{display:none !important;}
+
+.record-block{
+    margin-top:20px;
+    padding:12px;
+    background:#f0fdf4;
+    border-radius:8px;
+}
+.record-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:8px 0;
+    padding:6px 10px;
+    background:#fff;
+    border-radius:6px;
+    border:1px solid #e2e8f0;
+}
+.record-empty{color:#71717a;}
+.wrap-right{text-align:right;margin-top:10px;}
+
+.tag-heavy{background:#fce803;color:#000;padding:2px 10px;border-radius:4px;font-weight:bold;}
+.tag-overload{background:#dc2626;color:#fff;padding:2px 10px;border-radius:4px;font-weight:bold;}
+</style>
+</head>
+<body>
+<h1>项链 LTWH计算器</h1>
+
+<!--横向模式切换卡片-->
+<div class="mode-wrap">
+  <div class="mode-card active" data-mode="mode1" onclick="switchModeByCard('mode1')">
+    <div class="title">模式 1</div>
+    <div class="desc">输入W+目标H，推荐T(双边悬链)</div>
+  </div>
+  <div class="mode-card" data-mode="mode2" onclick="switchModeByCard('mode2')">
+    <div class="title">模式 2</div>
+    <div class="desc">输入选定T+W，计算H(双边悬链)</div>
+  </div>
+  <div class="mode-card" data-mode="mode3" onclick="switchModeByCard('mode3')">
+    <div class="title">模式 3</div>
+    <div class="desc">输入目标有效L，求T(单吊模式)</div>
+  </div>
+</div>
+
+<div id="panelMode1" class="panel">
+  <div class="row">
+    <label>跨度 W(mm)：</label>
+    <input id="inpW" type="number" placeholder="最小380">
+  </div>
+  <div class="row">
+    <label>目标下垂 H(mm)：</label>
+    <input id="inpHt" type="number" placeholder="客户想要H">
+  </div>
+</div>
+
+<div id="panelMode2" class="panel hide">
+  <div class="row">
+    <label>选定颗数 T：</label>
+    <input id="inpTfixed" type="number" placeholder="例如38">
+  </div>
+  <div class="row">
+    <label>跨度 W(mm)：</label>
+    <input id="inpW2" type="number" placeholder="最小380">
+  </div>
+</div>
+
+<div id="panelMode3" class="panel hide">
+  <div class="row">
+    <label>目标长度 L(mm)：</label>
+    <input id="inpSingleL" type="number" placeholder="例1978">
+  </div>
+</div>
+
+<div class="row">
+  <button onclick="calc()">开始计算</button>
+</div>
+
+<div class="result" id="out"></div>
+
+<!--记录区域-->
+<div id="recordBlock" class="record-block">
+  <div id="recordList"></div>
+  <div class="wrap-right">
+    <button class="btn-clear-all" onclick="clearAllRecord()">全部清除</button>
+  </div>
+</div>
+
+<script>
+//单吊模式固定扣减值
+const singleOffset = 42;
+//最多5条记录
+const MAX_RECORD = 5;
+//记录数组，内存临时存储
+let recordArr = Array(MAX_RECORD).fill(null);
+
+//TL数据表（T=15‑84）
+const TLData = [
+  {T:15, L:1404},
+  {T:16, L:1492},
+  {T:17, L:1580},
+  {T:18, L:1668},
+  {T:19, L:1756},
+  {T:20, L:1844},
+  {T:21, L:1932},
+  {T:22, L:2020},
+  {T:23, L:2108},
+  {T:24, L:2196},
+  {T:25, L:2284},
+  {T:26, L:2372},
+  {T:27, L:2460},
+  {T:28, L:2548},
+  {T:29, L:2629},
+  {T:30, L:2710},
+  {T:31, L:2791},
+  {T:32, L:2872},
+  {T:33, L:2960},
+  {T:34, L:3048},
+  {T:35, L:3141},
+  {T:36, L:3234},
+  {T:37, L:3327},
+  {T:38, L:3420},
+  {T:39, L:3512},
+  {T:40, L:3604},
+  {T:41, L:3675},
+  {T:42, L:3746},
+  {T:43, L:3834},
+  {T:44, L:3922},
+  {T:45, L:4044},
+  {T:46, L:4115},
+  {T:47, L:4220},
+  {T:48, L:4274},
+  {T:49, L:4362},
+  {T:50, L:4450},
+  {T:51, L:4538},
+  {T:52, L:4643},
+  {T:53, L:4748},
+  {T:54, L:4802},
+  {T:55, L:4924},
+  {T:56, L:5012},
+  {T:57, L:5100},
+  {T:58, L:5188},
+  {T:59, L:5276},
+  {T:60, L:5386},
+  {T:61, L:5474},
+  {T:62, L:5562},
+  {T:63, L:5650},
+  {T:64, L:5738},
+  {T:65, L:5826},
+  {T:66, L:5936},
+  {T:67, L:6046},
+  {T:68, L:6200},
+  {T:69, L:6302},
+  {T:70, L:6404},
+  {T:71, L:6530},
+  {T:72, L:6582},
+  {T:73, L:6647},
+  {T:74, L:6712},
+  {T:75, L:6816},
+  {T:76, L:6920},
+  {T:77, L:7024},
+  {T:78, L:7128},
+  {T:79, L:7232},
+  {T:80, L:7336},
+  {T:81, L:7440},
+  {T:82, L:7531},
+  {T:83, L:7622},
+  {T:84, L:7713}
+];
+
+//实测样本库（优先查表，命中则直接返回H，不跑公式）
+const LTwHData = [
+  {L:2020,T:22,W:800,H:846,note:"正常"},
+  {L:2020,T:22,W:1000,H:771,note:"正常"},
+  {L:2020,T:22,W:1200,H:684,note:"正常"},
+  {L:2020,T:22,W:1400,H:583,note:"正常"},
+  {L:2020,T:22,W:1500,H:526,note:"正常"},
+  {L:2020,T:22,W:1600,H:463,note:"安装困难"},
+  {L:2020,T:22,W:1800,H:null,note:"不可安装"},
+  {L:2020,T:22,W:2000,H:null,note:"不可安装"},
+
+  {L:3420,T:38,W:800,H:1594,note:"正常"},
+  {L:3420,T:38,W:1000,H:1542,note:"正常"},
+  {L:3420,T:38,W:1200,H:1482,note:"正常"},
+  {L:3420,T:38,W:1400,H:1416,note:"正常"},
+  {L:3420,T:38,W:1500,H:1380,note:"正常"},
+  {L:3420,T:38,W:1600,H:1342,note:"正常"},
+  {L:3420,T:38,W:1800,H:1262,note:"正常"},
+  {L:3420,T:38,W:2000,H:1173,note:"正常"},
+
+  {L:4450,T:50,W:800,H:2128,note:"正常"},
+  {L:4450,T:50,W:1000,H:2084,note:"正常"},
+  {L:4450,T:50,W:1200,H:2034,note:"正常"},
+  {L:4450,T:50,W:1400,H:1978,note:"正常"},
+  {L:4450,T:50,W:1500,H:1948,note:"正常"},
+  {L:4450,T:50,W:1600,H:1916,note:"正常"},
+  {L:4450,T:50,W:1800,H:1850,note:"正常"},
+  {L:4450,T:50,W:2000,H:1778,note:"正常"},
+
+  {L:5650,T:63,W:800,H:2743,note:"正常"},
+  {L:5650,T:63,W:1000,H:2705,note:"正常"},
+  {L:5650,T:63,W:1200,H:2662,note:"正常"},
+  {L:5650,T:63,W:1400,H:2614,note:"正常"},
+  {L:5650,T:63,W:1500,H:2589,note:"正常"},
+  {L:5650,T:63,W:1600,H:2562,note:"正常"},
+  {L:5650,T:63,W:1800,H:2505,note:"正常"},
+  {L:5650,T:63,W:2000,H:2443,note:"正常"},
+
+  {L:6530,T:71,W:800,H:3192,note:"正常"},
+  {L:6530,T:71,W:1000,H:3157,note:"正常"},
+  {L:6530,T:71,W:1200,H:3118,note:"正常"},
+  {L:6530,T:71,W:1400,H:3074,note:"正常"},
+  {L:6530,T:71,W:1500,H:3051,note:"正常"},
+  {L:6530,T:71,W:1600,H:3026,note:"正常"},
+  {L:6530,T:71,W:1800,H:2974,note:"正常"},
+  {L:6530,T:71,W:2000,H:2919,note:"正常"},
+
+  {L:2872,T:32,W:1700,H:976,note:"正常"},
+  {L:3604,T:40,W:2200,H:1193,note:"正常"},
+  {L:4220,T:47,W:2700,H:1336,note:"正常"},
+  {L:4802,T:54,W:3100,H:1506,note:"正常"}
+];
+
+//渲染记录列表
+function renderRecord(){
+  const dom = document.getElementById("recordList");
+  let html = "";
+  for(let i=0;i<MAX_RECORD;i++){
+    const d = recordArr[i];
+    if(d===null){
+      html += `<div class="record-item">
+        <span class="record-empty">记录${i+1}：（空）</span>
+        <button class="btn-clear-item" onclick="clearOneRecord(${i})">清除</button>
+      </div>`;
+    }else{
+      html += `<div class="record-item">
+        <span>记录${i+1}：T=${d.T}｜L=${d.L}｜W=${d.W}｜H=${d.H}</span>
+        <button class="btn-clear-item" onclick="clearOneRecord(${i})">清除</button>
+      </div>`;
+    }
+  }
+  dom.innerHTML = html;
+}
+
+//找第一个空的记录位置，返回索引，满了返回-1
+function getFirstEmptyRecordIndex(){
+  for(let i=0;i<MAX_RECORD;i++){
+    if(recordArr[i]===null) return i;
+  }
+  return -1;
+}
+
+//保存一条记录
+function pushRecord(obj){
+  const idx = getFirstEmptyRecordIndex();
+  if(idx === -1){
+    alert("记录已满（最多5条），请先清除部分记录");
+    return;
+  }
+  recordArr[idx] = {...obj};
+  renderRecord();
+}
+
+//单条清除
+function clearOneRecord(index){
+  recordArr[index] = null;
+  renderRecord();
+}
+
+//全部清除
+function clearAllRecord(){
+  recordArr = Array(MAX_RECORD).fill(null);
+  renderRecord();
+}
+
+//卡片点击切换模式
+function switchModeByCard(modeVal){
+  //更新卡片激活状态
+  document.querySelectorAll('.mode-card').forEach(card=>{
+    if(card.dataset.mode === modeVal){
+      card.classList.add('active');
+    }else{
+      card.classList.remove('active');
+    }
+  })
+  //切换面板
+  document.getElementById("panelMode1").classList.add("hide");
+  document.getElementById("panelMode2").classList.add("hide");
+  document.getElementById("panelMode3").classList.add("hide");
+  const recordBlock = document.getElementById("recordBlock");
+  if(modeVal==="mode1"){
+    document.getElementById("panelMode1").classList.remove("hide");
+    recordBlock.classList.remove("hide");
+  }else if(modeVal==="mode2"){
+    document.getElementById("panelMode2").classList.remove("hide");
+    recordBlock.classList.remove("hide");
+  }else if(modeVal==="mode3"){
+    document.getElementById("panelMode3").classList.remove("hide");
+    recordBlock.classList.add("hide");
+  }
+  document.getElementById("out").innerHTML="";
+}
+
+/**
+ * 获取总绳长L
+ * T=15‑84：TL数据表插值/原值
+ */
+function getLbyT(T){
+  const arr = [...TLData].sort((a,b)=>a.T-b.T);
+  for(let i=0;i<arr.length-1;i++){
+    const a=arr[i],b=arr[i+1];
+    if(a.T <= T && T <= b.T){
+      const ratio=(T-a.T)/(b.T-a.T);
+      const L = a.L + ratio*(b.L - a.L);
+      return {L:L, source:"sample"};
+    }
+  }
+  if(T>arr[arr.length-1].T){
+    const p1=arr[arr.length-2];
+    const p2=arr[arr.length-1];
+    const slope=(p2.L-p1.L)/(p2.T-p1.T);
+    const L = p2.L + slope*(T-p2.T);
+    return {L:L, source:"extrap"};
+  }
+  if(T<arr[0].T){
+    const p1=arr[0];
+    const p2=arr[1];
+    const slope=(p2.L-p1.L)/(p2.T-p1.T);
+    const L = p1.L + slope*(T-p1.T);
+    return {L:L, source:"extrap"};
+  }
+  return {L:null, source:"invalid"};
+}
+
+/**
+ * 核心H计算函数：Excel业务公式
+ */
+function catenarySolveH(W, L){
+  const pi = Math.PI;
+  const term1 = (12 * L / pi) - 4 * W;
+  let sqrtInner = (4 * W - 12 * L / pi) ** 2 - 24 * (6 * (W/2)**2 - 6 * (2 * L / pi) * (W/2) + (2 * L / pi)**2);
+  sqrtInner = Math.max(sqrtInner, 0);
+  const term2 = Math.sqrt(sqrtInner);
+  const H = (term1 + term2) / 12;
+  if(!isFinite(H) || H <= 0){
+    return null;
+  }
+  return H;
+}
+
+function lookupSample(T,W){
+  const matches = LTwHData.filter(x=>x.T===T && x.W===W);
+  if(matches.length===0) return null;
+  return matches[0];
+}
+
+//获取单吊T对应的标签HTML
+function getTTagHtml(T){
+  if(T>=1 && T<=50){
+    return "";
+  }else if(T>=51 && T<=63){
+    return `<span class="tag-heavy">偏重</span>`;
+  }else if(T>=64 && T<=84){
+    return `<span class="tag-overload">超重</span>`;
+  }else{
+    return "outOfRange";
+  }
+}
+
+function calc(){
+  //读取当前激活卡片的mode
+  let mode;
+  document.querySelectorAll('.mode-card').forEach(card=>{
+    if(card.classList.contains('active')) mode = card.dataset.mode;
+  })
+  const outDom = document.getElementById("out");
+  outDom.innerHTML="";
+
+  //====模式3：单吊模式====
+  if(mode==="mode3"){
+    const targetEffectiveL = Number(document.getElementById("inpSingleL").value);
+    if(isNaN(targetEffectiveL) || targetEffectiveL <= 0){
+      outDom.innerHTML="<div class='warn-y'>请输入有效的目标长度L(mm)</div>";
+      return;
+    }
+    const list=[];
+    for(let T=1;T<=84;T++){
+      const {L:Lraw,source} = getLbyT(T);
+      if(Lraw===null) continue;
+      const effectiveL = Lraw - singleOffset;
+      list.push({
+        T:T,
+        effectiveL:Math.round(effectiveL),
+        deltaRaw:effectiveL - targetEffectiveL,
+        delta:Math.round(Math.abs(effectiveL-targetEffectiveL)),
+        source:source
+      });
+    }
+    if(list.length===0){
+      outDom.innerHTML="<div class='warn-r'>没有可用T(1‑84)</div>";
+      return;
+    }
+    const below = list.filter(x=>x.effectiveL <= targetEffectiveL);
+    const above = list.filter(x=>x.effectiveL > targetEffectiveL);
+    let itemBelow=null,itemAbove=null;
+    if(below.length>0){
+      below.sort((a,b)=>b.effectiveL - a.effectiveL);
+      itemBelow = below[0];
+    }
+    if(above.length>0){
+      above.sort((a,b)=>a.effectiveL - b.effectiveL);
+      itemAbove = above[0];
+    }
+    let html="";
+    html += `<div class='normal'>单吊模式｜输入目标长度：${targetEffectiveL}mm</div>`;
+    html += "<h4>【邻近T二选一】</h4>";
+
+    //判断是否超出最大T=84，输出指定提示
+    if((itemBelow && itemBelow.T >=84) && (!itemAbove)){
+      html += `<div class="warn-r">不能生产， T=84，最大L7671</div>`;
+    }else{
+      if(itemBelow){
+        let note = itemBelow.deltaRaw < 0 ? "（偏短）" : "（匹配）";
+        const tagHtml = getTTagHtml(itemBelow.T);
+        html += `<div class="normal">
+<span>T=${itemBelow.T}｜单吊有效L=${itemBelow.effectiveL}mm｜偏差${itemBelow.delta}mm${note}</span>
+${tagHtml}
+</div>`;
+      }
+      if(itemAbove){
+        const tagHtml = getTTagHtml(itemAbove.T);
+        html += `<div class="normal">
+<span>T=${itemAbove.T}｜单吊有效L=${itemAbove.effectiveL}mm｜偏差${itemAbove.delta}mm（偏长）</span>
+${tagHtml}
+</div>`;
+      }
+    }
+    outDom.innerHTML = html;
+    return;
+  }
+
+  //====模式2：已知T、W求H，带记录按钮====
+  if(mode==="mode2"){
+    const Tfixed = Number(document.getElementById("inpTfixed").value);
+    const W = Number(document.getElementById("inpW2").value);
+    if(isNaN(Tfixed)||isNaN(W)){
+      outDom.innerHTML="<div class='warn-y'>请输入有效的数字</div>";
+      return;
+    }
+    if(W<380){
+      outDom.innerHTML="<div class='warn-r'>错误：跨度W不能小于380mm</div>";
+      return;
+    }
+    if(Tfixed<15 || Tfixed>84){
+      outDom.innerHTML="<div class='warn-y'>T建议范围15‑84</div>";
+    }
+    const {L:Lreal,source} = getLbyT(Tfixed);
+    if(Lreal===null){
+      outDom.innerHTML="<div class='warn-r'>该T无法计算绳长L</div>";
+      return;
+    }
+    if(Lreal <= W){
+      outDom.innerHTML="<div class='warn-r'>绳长L小于等于跨度W，物理不可安装</div>";
+      return;
+    }
+    const samp = lookupSample(Tfixed,W);
+    let Hreal=null;
+    if(samp){
+      if(samp.note==="不可安装"){
+        outDom.innerHTML="<div class='warn-r'>该T、W组合：样本标记不可安装</div>";
+        return;
+      }
+      Hreal = samp.H;
+    }
+    if(Hreal===null){
+      Hreal = catenarySolveH(W, Lreal);
+    }
+    if(Hreal===null || !isFinite(Hreal)){
+      outDom.innerHTML="<div class='warn-r'>无法求解下垂H</div>";
+      return;
+    }
+    const Lround = Math.round(Lreal);
+    const Hround = Math.round(Hreal);
+    let sourceTip="";
+    if(source==="formula") sourceTip=" ⚠️T‑L公式估算(15‑21)";
+    if(source==="extrap") sourceTip=" ⚠️T‑L向上外推T>84";
+
+    const recObj = {T:Tfixed, L:Lround, W:W, H:Hround};
+    let html="";
+    html += `<div class='normal'>输入：选定T=${Tfixed}，跨度W=${W}mm</div>`;
+    html += `<div class='normal'>
+<span>T=${Tfixed}｜总绳长L=${Lround}mm｜计算下垂H=${Hround}mm${sourceTip}</span>
+<button class="btn-record" onclick='pushRecord(${JSON.stringify(recObj)})'>记录</button>
+</div>`;
+    outDom.innerHTML = html;
+    return;
+  }
+
+  //====模式1：输入W+目标H，推荐T====
+  const W = Number(document.getElementById("inpW").value);
+  const Htarget = Number(document.getElementById("inpHt").value);
+  if(isNaN(W)||isNaN(Htarget)){
+    outDom.innerHTML="<div class='warn-y'>请输入有效的数字</div>";
+    return;
+  }
+  if(W<380){
+    outDom.innerHTML="<div class='warn-r'>错误：跨度W不能小于380mm</div>";
+    return;
+  }
+
+  const candidates = [];
+  for(let T=15;T<=84;T++){
+    const {L:Lreal, source} = getLbyT(T);
+    if(Lreal===null) continue;
+    if(Lreal <= W) continue;
+
+    const samp = lookupSample(T,W);
+    let Hreal=null;
+    let note="";
+    if(samp){
+      note = samp.note;
+      Hreal = samp.H;
+      if(note==="不可安装") continue;
+    }
+    if(Hreal===null){
+      Hreal = catenarySolveH(W, Lreal);
+      if(Hreal === null){
+        note = "绳长不足，达不到目标下垂";
+      }else{
+        note = "数学悬链计算(无实测样本)";
+      }
+    }
+    if(Hreal===null) continue;
+
+    const deltaRaw = Hreal - Htarget;
+    const deltaAbs = Math.abs(deltaRaw);
+    candidates.push({
+      T,
+      L:Math.round(Lreal),
+      H:Math.round(Hreal),
+      W: W,
+      deltaRaw:deltaRaw,
+      delta:Math.round(deltaAbs),
+      source:source,
+      note:note
+    })
+  }
+  if(candidates.length===0){
+    outDom.innerHTML="<div class='warn-r'>没有找到可行T(15‑84)，请降低目标H或者加大绳长</div>";
+    return;
+  }
+
+  const sampleList = candidates.filter(c=>c.source==="sample");
+  const formulaList = candidates.filter(c=>c.source==="formula");
+  const extrapList = candidates.filter(c=>c.source==="extrap");
+
+  sampleList.sort((a,b)=>a.delta-b.delta);
+  formulaList.sort((a,b)=>a.delta-b.delta);
+  extrapList.sort((a,b)=>a.delta-b.delta);
+  const fullSorted = [...sampleList, ...formulaList, ...extrapList];
+
+  const belowList = fullSorted.filter(c => c.H <= Htarget);
+  const aboveList = fullSorted.filter(c => c.H > Htarget);
+  let lower=null,upper=null;
+  if(belowList.length>0){
+    belowList.sort((a,b)=>b.H - a.H);
+    lower = belowList[0];
+  }
+  if(aboveList.length>0){
+    aboveList.sort((a,b)=>a.H - b.H);
+    upper = aboveList[0];
+  }
+
+  let html="";
+  html += `<div class='normal'>客户输入：W=${W}mm，目标H=${Htarget}mm；T范围：15‑84</div>`;
+  html += "<h4>【邻近整数颗数推荐（二选一）】</h4>";
+  if(lower) html += formatItem(lower);
+  if(upper) html += formatItem(upper);
+
+  outDom.innerHTML = html;
+}
+
+//模式1输出条目，增加记录按钮
+function formatItem(rec){
+  let desc;
+  if(rec.deltaRaw < 0){
+    desc = `偏差${rec.delta}mm（下垂偏短）`;
+  }else if(rec.deltaRaw >0){
+    desc = `偏差${rec.delta}mm（下垂偏长）`;
+  }else{
+    desc = `偏差${rec.delta}mm（完全匹配）`;
+  }
+  return `<div class="normal">
+<span>T=${rec.T}｜L=${rec.L}mm｜计算H=${rec.H}mm｜${desc}</span>
+<button class="btn-record" onclick='pushRecord(${JSON.stringify({T:rec.T,L:rec.L,W:rec.W,H:rec.H})})'>记录</button>
+</div>`;
+}
+
+renderRecord();
+</script>
+</body>
+</html>
